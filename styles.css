@@ -12,6 +12,7 @@
   * {
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
     outline: none;
     border: none;
     text-decoration: none;
@@ -25,14 +26,16 @@
   }
   
   section {
-    padding: 3rem 2rem;
+    padding: 2rem 2rem;
     margin: 0 auto;
     max-width: 1200px;
+    overflow: hidden;
+   
   }
   
   .header {
     position: fixed;
-    top: 0;
+    top: 5;
     left: 0;
     right: 0;
     z-index: 99;
@@ -41,8 +44,8 @@
   }
 
   .logo img {
-    width: 170px;
-    height: auto;
+    width: 150px;
+    height: 150px;
   }
   
   
@@ -88,11 +91,14 @@
   
   
   .home-container {
-    height: 100vh;
+    position: relative;
     background-position: center;
     color: white;
     background: url('/img/fundo.gif') no-repeat center;
     background-size: cover;
+    min-height: 100vh;
+    height: auto;
+     overflow: hidden;
   }
   
   
@@ -111,9 +117,12 @@
   
   
   .home-container section {
+    padding: 0;
     display: flex;
     align-items: center;
     min-height: 100vh;
+    height: 100vh;
+    
   
   }
   
@@ -228,7 +237,8 @@
     display: flex;
     align-items: center;
     background-color: var(--black);
-    gap: 1, 5rem;
+    gap: 1.5rem;
+
   }
   
   .about .row .content {
@@ -675,6 +685,9 @@
 }
   .footer {
     text-align: center;
+    margin-top: auto;
+  padding: 0;
+  min-height: auto;
   }
   
   .footer .share {
@@ -794,6 +807,7 @@
   
   
   
+  
   /* Responsividade */
   @media (max-width: 1024px) {
     .header section {
@@ -876,4 +890,13 @@
     right: 50px;
     z-index: 1000;
   }
+}
+
+
+
+html, body {
+  height: auto;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
