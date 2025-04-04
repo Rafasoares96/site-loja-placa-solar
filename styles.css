@@ -39,6 +39,12 @@
     border-bottom: var(--border);
     background-color: #ffffff;
   }
+
+  .logo img {
+    width: 170px;
+    height: auto;
+  }
+  
   
   .header section {
     display: flex;
@@ -65,7 +71,7 @@
   }
   
   .icons img {
-    font-size: 1.6rem;
+    font-size: 1.9rem;
     margin: 1rem;
     cursor: pointer;
     transition: 0.4s;
@@ -621,6 +627,34 @@
 }
 
 
+.avaliacao-container {
+  text-transform: uppercase;
+  font-size: 2.7rem;
+  color:#2929e9;
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 15px;
+  margin: 0 auto;
+  border-radius: 10px;
+  max-width: 400px;
+}
+
+.estrelas {
+  display: inline-block;
+}
+
+.estrela {
+  font-size: 2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.estrela.selecionada {
+  color: gold;
+}
+
+
   
   
   
@@ -717,48 +751,34 @@
     transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
   }
   /* Esconder botão no desktop */
-.menu-btn {
-  display: none;
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-/* Mostrar botão apenas em telas menores (celulares) */
-@media (max-width: 768px) {
-  .menu-btn {
+  @media (max-width: 768px) {
+    .menu-btn {
       display: block;
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
       position: absolute;
       top: 10px;
-      right: 10px;
-  }
-
-  /* Esconder o menu por padrão */
-  .navbar {
+      right: 50px;
+      z-index: 1000;
+    }
+  
+    .navbar {
       display: none;
       flex-direction: column;
       background: white;
       position: absolute;
-      top: 50px;
-      right: 10px;
+      top: 60px;
+      right: 20px;
       width: 200px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .navbar a {
-      padding: 10px;
-      display: block;
-      text-align: center;
-  }
-
-  /* Quando a classe 'active' é adicionada, o menu aparece */
-  .navbar.active {
+      z-index: 999;
+    }
+  
+    .navbar.active {
       display: flex;
+    }
   }
-}
-
   
   
   
@@ -834,3 +854,26 @@
       width: 200px; /* Ajuste para dispositivos menores */
     }
   }
+
+
+
+
+  /* Botão some por padrão (PC) */
+.menu-btn {
+  display: none !important;
+}
+
+/* Botão aparece no celular */
+@media screen and (max-width: 768px) {
+  .menu-btn {
+    display: block !important;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    z-index: 1000;
+  }
+}
