@@ -181,7 +181,7 @@
 
     <section class="menu" id="menu">
         <h2 class="title">Nossos <span>Serviços</span></h2>
-        <div class="row" id="services-list">
+    <div class="row" id="services-list">
 
 
 
@@ -921,8 +921,7 @@
 
 
 
-
- <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
     getFirestore,
@@ -933,12 +932,12 @@
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDSOqRV3vcnzF-mIMHOTrffF7oO0UFH5rE",
-    authDomain: "site-placa-solar.firebaseapp.com",
-    projectId: "site-placa-solar",
-    storageBucket: "site-placa-solar.firebasestorage.app",
-    messagingSenderId: "256591690469",
-    appId: "1:256591690469:web:2fc7eb789cbe3c6ba1b20c"
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_AUTH_DOMAIN",
+    projectId: "SEU_PROJECT_ID",
+    storageBucket: "SEU_STORAGE_BUCKET",
+    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+    appId: "SEU_APP_ID"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -959,7 +958,7 @@
     if (!container) return;
 
     try {
-      const q = query(collection(db, "services"), orderBy("ordem", "asc"));
+      const q = query(collection(db, "services"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
 
       snapshot.forEach((docSnap, index) => {
@@ -969,14 +968,13 @@
         const resumo = escapeHtml(data.resumo || "");
         const detalhes = escapeHtml(data.detalhes || "").replaceAll("\n", "<br>");
         const imagem = data.imagem || "";
-        const docId = docSnap.id;
         const dataView = `service_dynamic_${index + 1}`;
 
         const html = `
           <div class="col-md-4 col-md-offset-0 col-sm-4 col-sm-offset-0 col-xs-10 col-xs-offset-1 dynamic-service-card">
             <div class="block">
               <a href="javascript:;" 
-                 data-id="${docId}" 
+                 data-id="dynamic_${index + 1}" 
                  data-view="${dataView}" 
                  data-toggle="modal"
                  data-target="#service-modal" 
@@ -1010,7 +1008,6 @@
 
   carregarServicos();
 </script>
-
 
 
 
