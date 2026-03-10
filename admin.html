@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Painel RJMax</title>
+</head>
+
+<body>
+
+<h2>Adicionar foto da instalação</h2>
+
+<input type="file" id="foto">
+<br><br>
+
+<input type="text" id="legenda" placeholder="Legenda da foto">
+<br><br>
+
+<button onclick="upload()">Enviar Foto</button>
+
+<script>
+
+async function upload(){
+
+const file = document.getElementById("foto").files[0]
+
+const formData = new FormData()
+
+formData.append("file", file)
+formData.append("upload_preset", "site_rjmax")
+
+const res = await fetch(
+"https://api.cloudinary.com/v1_1/dnfjpphhk/image/upload",
+{
+method:"POST",
+body:formData
+})
+
+const data = await res.json()
+
+alert("Imagem enviada!")
+
+console.log(data.secure_url)
+
+}
+
+</script>
+
+</body>
+</html>
