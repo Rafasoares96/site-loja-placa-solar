@@ -138,6 +138,11 @@
       messagingSenderId: "256591690469",
       appId: "1:256591690469:web:2fc7eb789cbe3c6ba1b20c"
     };
+console.log(firebaseConfig);
+
+if (!firebaseConfig.apiKey || !firebaseConfig.apiKey.startsWith("AIza")) {
+  throw new Error("A apiKey do Firebase está errada ou não foi colada.");
+}
 
     const cloudName = "dnfjpphhk";
     const uploadPreset = "site_rjmax";
