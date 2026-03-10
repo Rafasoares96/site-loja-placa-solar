@@ -1,226 +1,142 @@
-<!DOCTYPE html>
-<<<<<<< HEAD
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel RJMax</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
-    .container { max-width: 1100px; margin: 0 auto; }
-    .card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 18px rgba(0,0,0,.08); }
-    input, textarea { width: 100%; padding: 12px; margin: 8px 0 14px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-    textarea { min-height: 120px; resize: vertical; }
-    button { background: #0d6efd; color: #fff; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; margin-right: 8px; }
-    button.delete { background: #dc3545; }
-    .msg { font-weight: bold; margin-top: 10px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-    .item { background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
-    .item img { width: 100%; height: 180px; object-fit: cover; display: block; }
-    .item .content { padding: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Painel Serviços RJMax</h1>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    <div class="card">
-      <h2>Adicionar Serviço</h2>
-      <input type="file" id="service-image" accept="image/*">
-      <input type="text" id="service-title" placeholder="Título do serviço">
-      <textarea id="service-summary" placeholder="Resumo curto"></textarea>
-      <textarea id="service-details" placeholder="Texto completo do Ver mais"></textarea>
-      <input type="number" id="service-order" placeholder="Ordem (1, 2, 3...)">
-      <button id="save-service">Salvar serviço</button>
-      <div class="msg" id="service-msg"></div>
-    </div>
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_AUTH_DOMAIN",
+    projectId: "SEU_PROJECT_ID",
+    storageBucket: "SEU_STORAGE_BUCKET",
+    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+    appId: "SEU_APP_ID"
+  };
 
-    <div class="card">
-      <h2>Serviços cadastrados no painel</h2>
-      <div class="grid" id="services-admin-list"></div>
-    </div>
-  </div>
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      getDocs,
-      deleteDoc,
-      doc,
-      query,
-      orderBy,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  const cloudName = "dnfjpphhk";
+  const uploadPreset = "site_rjmax";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDSOqRV3vcnzF-mIMHOTrffF7oO0UFH5rE",
-      authDomain: "site-placa-solar.firebaseapp.com",
-      projectId: "SEU_PROJECT_Isite-placa-solar",
-      storageBucket: "site-placa-solar.firebasestorage.app",
-      messagingSenderId: "256591690469",
-      appId: "1:256591690469:web:2fc7eb789cbe3c6ba1b20c"
-    };
+  async function uploadImage(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const cloudName = "dnfjpphhk";
-    const uploadPreset = "site_rjmax";
-
-    async function uploadImage(file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", uploadPreset);
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await res.json();
-      if (!data.secure_url) throw new Error("Falha no upload");
-      return data.secure_url;
-    }
-
-    async function carregarServicosAdmin() {
-      const list = document.getElementById("services-admin-list");
-      list.innerHTML = "Carregando...";
-
-      const q = query(collection(db, "services"), orderBy("ordem", "asc"));
-      const snapshot = await getDocs(q);
-
-      if (snapshot.empty) {
-        list.innerHTML = "<p>Nenhum serviço cadastrado ainda.</p>";
-        return;
-      }
-
-      list.innerHTML = "";
-
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-
-        list.innerHTML += `
-          <div class="item">
-            <img src="${data.imagem}" alt="${data.titulo}">
-            <div class="content">
-              <h3>${data.titulo || ""}</h3>
-              <p>${data.resumo || ""}</p>
-              <p><strong>Ordem:</strong> ${data.ordem || 0}</p>
-              <button class="delete" data-id="${docSnap.id}">Excluir</button>
-            </div>
-          </div>
-        `;
-      });
-
-      document.querySelectorAll(".delete").forEach((btn) => {
-        btn.onclick = async () => {
-          if (!confirm("Deseja excluir este serviço?")) return;
-          await deleteDoc(doc(db, "services", btn.dataset.id));
-          carregarServicosAdmin();
-        };
-      });
-    }
-
-    document.getElementById("save-service").addEventListener("click", async () => {
-      const msg = document.getElementById("service-msg");
-      const file = document.getElementById("service-image").files[0];
-      const titulo = document.getElementById("service-title").value.trim();
-      const resumo = document.getElementById("service-summary").value.trim();
-      const detalhes = document.getElementById("service-details").value.trim();
-      const ordem = Number(document.getElementById("service-order").value || 0);
-
-      if (!file || !titulo) {
-        msg.style.color = "red";
-        msg.textContent = "Selecione imagem e título.";
-        return;
-      }
-
-      try {
-        msg.style.color = "#333";
-        msg.textContent = "Enviando imagem...";
-
-        const imagem = await uploadImage(file);
-
-        await addDoc(collection(db, "services"), {
-          titulo,
-          resumo,
-          detalhes,
-          imagem,
-          ordem,
-          createdAt: serverTimestamp()
-        });
-
-        msg.style.color = "green";
-        msg.textContent = "Serviço salvo com sucesso.";
-
-        document.getElementById("service-image").value = "";
-        document.getElementById("service-title").value = "";
-        document.getElementById("service-summary").value = "";
-        document.getElementById("service-details").value = "";
-        document.getElementById("service-order").value = "";
-
-        carregarServicosAdmin();
-      } catch (error) {
-        console.error(error);
-        msg.style.color = "red";
-        msg.textContent = "Erro ao salvar serviço.";
-      }
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: "POST",
+      body: formData
     });
 
-    carregarServicosAdmin();
-  </script>
-</body>
-</html>
-=======
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Painel RJMax</title>
-</head>
+    const data = await res.json();
+    console.log("Resposta Cloudinary:", data);
 
-<body>
+    if (!res.ok) {
+      throw new Error(data?.error?.message || "Falha no upload da imagem no Cloudinary.");
+    }
 
-<h2>Adicionar foto da instalação</h2>
+    if (!data.secure_url) {
+      throw new Error("Cloudinary não retornou a URL da imagem.");
+    }
 
-<input type="file" id="foto">
-<br><br>
+    return data.secure_url;
+  }
 
-<input type="text" id="legenda" placeholder="Legenda da foto">
-<br><br>
+  async function carregarServicosAdmin() {
+    const list = document.getElementById("services-admin-list");
+    list.innerHTML = "Carregando...";
 
-<button onclick="upload()">Enviar Foto</button>
+    const q = query(collection(db, "services"), orderBy("ordem", "asc"));
+    const snapshot = await getDocs(q);
 
-<script>
+    if (snapshot.empty) {
+      list.innerHTML = "<p>Nenhum serviço cadastrado ainda.</p>";
+      return;
+    }
 
-async function upload(){
+    list.innerHTML = "";
 
-const file = document.getElementById("foto").files[0]
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
 
-const formData = new FormData()
+      list.innerHTML += `
+        <div class="item">
+          <img src="${data.imagem}" alt="${data.titulo}">
+          <div class="content">
+            <h3>${data.titulo || ""}</h3>
+            <p>${data.resumo || ""}</p>
+            <p><strong>Ordem:</strong> ${data.ordem || 0}</p>
+            <button class="delete" data-id="${docSnap.id}">Excluir</button>
+          </div>
+        </div>
+      `;
+    });
 
-formData.append("file", file)
-formData.append("upload_preset", "site_rjmax")
+    document.querySelectorAll(".delete").forEach((btn) => {
+      btn.onclick = async () => {
+        if (!confirm("Deseja excluir este serviço?")) return;
+        await deleteDoc(doc(db, "services", btn.dataset.id));
+        carregarServicosAdmin();
+      };
+    });
+  }
 
-const res = await fetch(
-"https://api.cloudinary.com/v1_1/dnfjpphhk/image/upload",
-{
-method:"POST",
-body:formData
-})
+  document.getElementById("save-service").addEventListener("click", async () => {
+    const msg = document.getElementById("service-msg");
+    const file = document.getElementById("service-image").files[0];
+    const titulo = document.getElementById("service-title").value.trim();
+    const resumo = document.getElementById("service-summary").value.trim();
+    const detalhes = document.getElementById("service-details").value.trim();
+    const ordem = Number(document.getElementById("service-order").value || 0);
 
-const data = await res.json()
+    if (!file || !titulo) {
+      msg.style.color = "red";
+      msg.textContent = "Selecione imagem e título.";
+      return;
+    }
 
-alert("Imagem enviada!")
+    try {
+      msg.style.color = "#333";
+      msg.textContent = "Enviando imagem...";
 
-console.log(data.secure_url)
+      const imagem = await uploadImage(file);
 
-}
+      msg.textContent = "Salvando no Firestore...";
 
+      await addDoc(collection(db, "services"), {
+        titulo,
+        resumo,
+        detalhes,
+        imagem,
+        ordem,
+        createdAt: serverTimestamp()
+      });
+
+      msg.style.color = "green";
+      msg.textContent = "Serviço salvo com sucesso.";
+
+      document.getElementById("service-image").value = "";
+      document.getElementById("service-title").value = "";
+      document.getElementById("service-summary").value = "";
+      document.getElementById("service-details").value = "";
+      document.getElementById("service-order").value = "";
+
+      carregarServicosAdmin();
+    } catch (error) {
+      console.error("Erro ao salvar serviço:", error);
+      msg.style.color = "red";
+      msg.textContent = "Erro ao salvar serviço: " + error.message;
+    }
+  });
+
+  carregarServicosAdmin();
 </script>
-
-</body>
-</html>
->>>>>>> eef4ff1e9cab0f86b3c85451e2feed1f78b6ec8e
