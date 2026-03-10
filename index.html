@@ -181,7 +181,7 @@
 
     <section class="menu" id="menu">
         <h2 class="title">Nossos <span>Serviços</span></h2>
-        <div class="row">
+        <div class="row" id="services-list">
 
 
 
@@ -736,6 +736,7 @@
                 <hr class="margin-top-40 margin-bottom-40" />
             </div>
         </div>
+             </div>
 
      
 
@@ -921,7 +922,94 @@
 
 
 
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSOqRV3vcnzF-mIMHOTrffF7oO0UFH5rE",
+    authDomain: "site-placa-solar.firebaseapp.com",
+    projectId: "site-placa-solar",
+    storageBucket: "site-placa-solar.firebasestorage.app",
+    messagingSenderId: "256591690469",
+    appId: "1:256591690469:web:2fc7eb789cbe3c6ba1b20c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  function escapeHtml(text) {
+    if (!text) return "";
+    return text
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  async function carregarServicos() {
+    const container = document.getElementById("services-list");
+    if (!container) return;
+
+    try {
+      const q = query(collection(db, "services"), orderBy("ordem", "asc"));
+      const snapshot = await getDocs(q);
+
+      snapshot.forEach((docSnap, index) => {
+        const data = docSnap.data();
+
+        const titulo = escapeHtml(data.titulo || "");
+        const resumo = escapeHtml(data.resumo || "");
+        const detalhes = escapeHtml(data.detalhes || "").replaceAll("\n", "<br>");
+        const imagem = data.imagem || "";
+        const docId = docSnap.id;
+        const dataView = `service_dynamic_${index + 1}`;
+
+        const html = `
+          <div class="col-md-4 col-md-offset-0 col-sm-4 col-sm-offset-0 col-xs-10 col-xs-offset-1 dynamic-service-card">
+            <div class="block">
+              <a href="javascript:;" 
+                 data-id="${docId}" 
+                 data-view="${dataView}" 
+                 data-toggle="modal"
+                 data-target="#service-modal" 
+                 class="service-details thumb-image lazy"
+                 title="${titulo}" 
+                 style="background-image: url('${imagem}');"></a>
+            </div>
+            <div class="block">
+              <h5 class="texto-18 margin-top-15 margin-bottom-15">${titulo}</h5>
+              <p class="contente">
+                ${resumo}
+                <br><br>
+                <span class="more-text">${detalhes}</span>
+              </p>
+              <a href="javascript:void(0);"
+                 class="service-details btn btn-primary btn-filled read-more margin-top-20"
+                 onclick="toggleText(this)">
+                Ver mais &rsaquo;
+              </a>
+            </div>
+            <hr class="margin-top-40 margin-bottom-40" />
+          </div>
+        `;
+
+        container.insertAdjacentHTML("beforeend", html);
+      });
+    } catch (error) {
+      console.error("Erro ao carregar serviços:", error);
+    }
+  }
+
+  carregarServicos();
+</script>
 
 
 
@@ -1025,6 +1113,9 @@ function openModal(img) {
 function closeModal() {
   document.getElementById("myModal").style.display = "none";
 }
+
+
+
 </script>
 
             
